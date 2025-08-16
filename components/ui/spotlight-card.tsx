@@ -43,7 +43,7 @@ const GlowCard: React.FC<GlowCardProps> = ({
     const syncPointer = (e: PointerEvent) => {
       const { clientX: x, clientY: y } = e
 
-      if (cardRef.current) {
+      if (cardRef.current && typeof window !== "undefined") {
         cardRef.current.style.setProperty("--x", x.toFixed(2))
         cardRef.current.style.setProperty("--xp", (x / window.innerWidth).toFixed(2))
         cardRef.current.style.setProperty("--y", y.toFixed(2))
@@ -51,8 +51,10 @@ const GlowCard: React.FC<GlowCardProps> = ({
       }
     }
 
-    document.addEventListener("pointermove", syncPointer)
-    return () => document.removeEventListener("pointermove", syncPointer)
+    if (typeof window !== "undefined") {
+      document.addEventListener("pointermove", syncPointer)
+      return () => document.removeEventListener("pointermove", syncPointer)
+    }
   }, [])
 
   const { base, spread } = glowColorMap[glowColor]

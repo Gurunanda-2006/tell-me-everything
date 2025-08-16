@@ -384,9 +384,12 @@ class Star {
 export function SpiralAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<AnimationController | null>(null)
-  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight })
+  const [dimensions, setDimensions] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 800,
+    height: typeof window !== "undefined" ? window.innerHeight : 600,
+  })
 
-  // 处理窗口大小变化
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
@@ -400,7 +403,7 @@ export function SpiralAnimation() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  // 创建和管理动画
+  // Create and manage animation
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -408,26 +411,20 @@ export function SpiralAnimation() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // 处理DPR以解决模糊问题
-    const dpr = window.devicePixelRatio || 1
-    // 使用全屏尺寸
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
     const size = Math.max(dimensions.width, dimensions.height)
 
     canvas.width = size * dpr
     canvas.height = size * dpr
 
-    // 设置CSS尺寸
     canvas.style.width = `${dimensions.width}px`
     canvas.style.height = `${dimensions.height}px`
 
-    // 缩放上下文以适应DPR
     ctx.scale(dpr, dpr)
 
-    // 创建动画控制器
     animationRef.current = new AnimationController(canvas, ctx, dpr, size)
 
     return () => {
-      // 清理动画
       if (animationRef.current) {
         animationRef.current.destroy()
         animationRef.current = null
